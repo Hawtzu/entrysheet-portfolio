@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>枯山水</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="board"></div>
+    <div id="controls">
+        <div id="turnIndicator">ターン: プレイヤー1</div>
+        <div id="phaseIndicator">フェーズ: 移動フェーズ</div>
+        <div id="diceDisplay">サイコロの目: -</div>
+    </div>
+    <div id="common-skills">
+        <button id="skill1" class="skill-button" disabled>プラス１ (+1目, コスト: 100)</button>
+        <button id="skill2" class="skill-button" disabled>マイナス１ (-1目, コスト: 100)</button>
+    </div>   
+    <div id="left-skill-area">
+        <div class="skill-box">
+            <!-- プレイヤー1スキル選択 -->
+            <h3>個人スキル</h3>
+            <div class="skill-selection">
+                <button class="prev-skill">←</button>
+                <div class="skill-display">
+                    <img src="assets/icons/defense-icon.png" alt="スキルアイコン" id="player1-skill-icon" class="skill-icon">
+                    <div id="player1-skill-name">防御</div>
+                    <p id="player1-skill-desc">石の配置をスキップする</p>
+                </div>
+                <button class="next-skill">→</button>
+            </div>
+            <button id="confirm-player1-skill">スキル決定</button>
+        </div>
+    </div>
+    
+    <div id="right-skill-area">
+        <div class="skill-box">
+            <!-- プレイヤー2スキル選択 -->
+            <h3>個人スキル</h3>
+            <div class="skill-selection">
+                <button class="prev-skill">←</button>
+                <div class="skill-display">
+                    <img src="assets/icons/double-dice-icon.png" alt="スキルアイコン" id="player2-skill-icon" class="skill-icon">
+                    <div id="player2-skill-name">ダブルサイコロ</div>
+                    <p id="player2-skill-desc">サイコロを2回振る</p>
+                </div>
+                <button class="next-skill">→</button>
+            </div>
+            <button id="confirm-player2-skill">スキル決定</button>
+        </div>
+    </div>
+    
+      
+    <div id="game-container">
+        <div id="player1-info">
+            <div id="player1-points">ポイント: 0</div>
+            <div id="player1-next-dice">次のサイコロの目: -</div>
+            <div id="player1-current-dice">現在のサイコロの目: -</div>
+        </div>
+        <div id="player2-info">
+            <div id="player2-points">ポイント: 0</div>
+            <div id="player2-next-dice">次のサイコロの目: -</div>
+            <div id="player2-current-dice">現在のサイコロの目: -</div>
+        </div>        
+    </div>
+
+
+    
+    
+    <script src="js/script.js"></script>
+</body>
+</html>

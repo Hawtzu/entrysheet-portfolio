@@ -1,0 +1,132 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    position: relative;
+}
+
+
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 2px;
+    position: absolute;
+    top: 100px;
+    left: 200px
+}
+
+#board div {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+    font-size: 20px;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 20px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+button:disabled {
+    background-color: lightgray;
+    color: gray;
+    cursor: not-allowed;
+}
+
+button:enabled {
+    background-color: lightblue;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
+button:enabled:hover {
+    background-color: lightgreen;
+    color: black;
+}
+
+#rollDice {
+    position: absolute;
+    top: 100px;
+    left: 750px;
+}
+
+#diceResult, #turnIndicator {
+    margin: 10px 0;
+}
+
+#diceResult {
+    position: absolute;
+    top: 160px;
+    left: 770px;
+}
+
+#diceResult.player {
+    background-color: lightgreen;
+}
+
+#diceResult.enemy {
+    background-color: lightcoral;
+}
+
+
+
+#turnIndicator {
+    position: absolute;
+    top: 200px;
+    left: 1000px;
+}
+
+#turnCount {
+    position: absolute;
+    top: 230px;
+    left: 1000px;
+}
+
+
+
+#timer { /* タイマーのスタイルを追加 */
+    position: absolute;
+    top: 250px;
+    left: 1000px;
+    font-size: 16px;
+}
+
+#directionButtons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    position: absolute;
+    top: 200px ;
+    left: 720px;
+}
+
+
+
+/* 5の選択肢ボタンをサイコロのボタンと同じ位置に配置 */
+#fiveOptions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 100px;
+    left: 600px;
+}

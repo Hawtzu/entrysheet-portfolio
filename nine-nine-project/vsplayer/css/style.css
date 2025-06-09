@@ -1,0 +1,285 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 2px;
+    position: relative; /* ボタンの正確な配置のために相対位置を指定 */
+
+    background-image: url('../assets/images/kare.jpg'); /* 正しいパスを指定 */
+    background-size: cover; /* 背景を画面全体にフィット */
+    background-repeat: no-repeat; /* 繰り返さない */
+    background-position: center; /* 中央に配置 */
+
+    /* 背景色と透明度を追加 */
+    background-color: rgba(255, 255, 255, 0.8); /* 白色で透明度80% */
+    border: 2px solid #000; /* 外枠を黒で目立たせる */
+    border-radius: 8px; /* 角を丸くする */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 影を追加して浮き上がらせる */
+    padding: 5px; /* ボード全体に少し余白を追加 */
+}
+
+
+.grid {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    position: relative; /* ボタンが正確に重なるように */
+}
+
+.grid.player1 {
+    background-color: lightblue;
+}
+
+.grid.player2 {
+    background-color: lightcoral;
+}
+
+.grid.stone {
+    background-color: gray;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: lightblue;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: lightgreen;
+}
+
+button:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+}
+
+#controls {
+    margin-top: 20px;
+
+    /* 背景色とデザインを追加 */
+    background-color: rgba(255, 255, 255, 0.9); /* 白色で透明度90% */
+    padding: 10px 20px; /* 内側の余白を確保 */
+    border-radius: 8px; /* 角を丸くする */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 軽い影を付ける */
+    text-align: center; /* テキストを中央揃え */
+    width: fit-content; /* 必要な幅に合わせる */
+}
+
+
+#diceResult, #turnIndicator {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+/* 一時的なボタンのスタイル */
+.temp-button {
+    position: absolute; /* グリッド上の正確な位置に表示 */
+    width: 40px;
+    height: 40px;
+    z-index: 10; /* ボタンを上層に表示 */
+    background-color: yellow;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.temp-button:hover {
+    background-color: orange;
+}
+
+
+#game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+#player1-info, #player2-info {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+
+    /* 背景色とデザインを追加 */
+    background-color: rgba(255, 255, 255, 0.9); /* 白色で透明度90% */
+    padding: 10px; /* 内側の余白を確保 */
+    border-radius: 8px; /* 角を丸くする */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 軽い影を付ける */
+}
+
+#player1-info {
+    padding-right: 20px;
+}
+
+#player2-info {
+    padding-left: 20px;
+}
+
+
+#player1-next-dice, #player1-current-dice, #player2-next-dice, #player2-current-dice {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+
+
+#player1-points, #player2-points {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: darkgreen;
+}
+
+.skill-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: lightblue;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.skill-button:hover {
+    background-color: deepskyblue;
+}
+
+.hidden {
+    display: none;
+}
+
+
+.skill-button.enabled {
+    background-color: lightgreen;
+    cursor: pointer;
+}
+
+.skill-button:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+}
+
+/* 左右のスキルエリアのスタイル */
+#left-skill-area, #right-skill-area {
+    position: absolute;
+    top: 20px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* アイコンとスキル名の間隔 */
+}
+
+#left-skill-area {
+    left: 100px; /* 左側に配置 */
+}
+
+#right-skill-area {
+    right: 100px; /* 右側に配置 */
+}
+
+/* スキルアイコンのスタイル */
+.skill-icon {
+    width: 500px;
+    height: 100px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* スキル名のスタイル */
+.skill-name {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* 左右のスキルエリアスタイル */
+.skill-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 250px; /* 横幅を指定（例: 250px に拡大） */
+    min-width: 250px; /* 最小幅を設定してレイアウト崩れを防止 */
+    max-width: 300px; /* 最大幅を制限（必要に応じて調整） */
+    text-align: center;
+}
+
+.skill-selection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.skill-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.skill-display {
+    text-align: center;
+}
+
+button.prev-skill, button.next-skill {
+    padding: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: lightblue;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button.prev-skill:hover, button.next-skill:hover {
+    background-color: deepskyblue;
+}
+
+button#confirm-player1-skill, button#confirm-player2-skill {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: lightgreen;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button#confirm-player1-skill:hover, button#confirm-player2-skill:hover {
+    background-color: green;
+}

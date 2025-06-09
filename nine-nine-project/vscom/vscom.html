@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vscom盤上サバイバルゲーム</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="board"></div>
+    <div id="controls">
+        <button id="rollDice">サイコロを振る</button>
+        <div id="fiveOptions" class="hidden">
+            <button id="option1">普通に5マス移動する</button>
+            <button id="option2">移動をスキップして石を置く</button>
+        </div>
+        <div id="diceResult">サイコロの目: -</div>
+        <div id="turnIndicator">ターン: プレイヤー</div>
+        <div id="turnCount">ターン数: 0</div>
+        <div id="timer">残り時間: 5:00</div> <!-- タイマーを追加 -->
+        <div id="directionButtons">
+            <button class="direction" data-direction="up-left">↖</button>
+            <button class="direction" data-direction="up">↑</button>
+            <button class="direction" data-direction="up-right">↗</button>
+            <button class="direction" data-direction="left">←</button>
+            <button class="direction" data-direction="center" disabled>・</button>
+            <button class="direction" data-direction="right">→</button>
+            <button class="direction" data-direction="down-left">↙</button>
+            <button class="direction" data-direction="down">↓</button>
+            <button class="direction" data-direction="down-right">↘</button>
+        </div>
+    </div>
+    <audio id="stoneSound" src="audio/stone_sound.mp3"></audio>
+    <script src="js/script.js"></script>
+</body>
+</html>
