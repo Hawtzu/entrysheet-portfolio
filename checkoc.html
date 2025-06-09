@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>3D Map Animation</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
+  <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaGF3dHp1MTAyOCIsImEiOiJjbHhhNHp0bmQxamluMmlyMDhqMXN6bXJpIn0.QVmFDnr2qTg-tJcbGDfQcg';
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [139.75914587, 35.81216782],
+      zoom: 14,
+      projection: "globe"
+    });
+
+    map.on("load", () => {
+      map.addSource('mapbox-dem', {//地形をロードしている
+        'type': 'raster-dem',
+        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        'tileSize': 512,
+        'maxzoom': 14
+      });
+      map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1 });
+
+
+
+      //fetch('route1.geojson')
+      //fetch('smoothed_path3.geojson')
+      fetch('smoothed_route_0901.geojson')
+      //fetch('bus_route3.geojson')
+      .then(response => response.json())
+        .then(busRoute => {
+          map.addSource("bus-route", {
+            type: "geojson",
+            data: busRoute,
+            lineMetrics: true
+          });
+
+          map.addLayer({
+            id: "bus-route-line",
+            type: "line",
+            source: "bus-route",
+            paint: {
+              "line-color": "yellow",
+              "line-width": 4,
+              "line-opacity": 0.7
+            }
+          });
+          
+
+          map.addLayer({
+            id: "current-position",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "FeatureCollection",
+                features: []
+              }
+            },
+            paint: {
+              "circle-radius": 6,
+              "circle-color": "purple"
+            }
+          });
+
+          map.addLayer({
+        'id': '3d-buildings',
+        'source': 'composite',
+        'source-layer': 'building',
+        'filter': ['==', 'extrude', 'true'],
+        'type': 'fill-extrusion',
+        'minzoom': 15,
+        'paint': {
+          'fill-extrusion-color': '#aaa',
+          'fill-extrusion-height': [
+            'interpolate', ['linear'], ['zoom'],
+            15, 0,
+            15.05, ['get', 'height']
+          ],
+          'fill-extrusion-base': [
+            'interpolate', ['linear'], ['zoom'],
+            15, 0,
+            15.05, ['get', 'min_height']
+          ],
+          'fill-extrusion-opacity': 1
+        }
+      });
+
+          //const totalFrames = 3000; // 総フレーム数
+          const totalFrames = 10000; // 総フレーム数
+          const altitude = 100;
+          const pitch = 75;
+          const alpha = 1;
+          const beta = 1;
+          let currentFrame = 0;
+          let bearing = 0;
+          let preMerLngLat = null;
+          let preBearing = null;
+          let preMerCameraLngLat = null;
+          let smoothedlagLat = null;
+
+          function computeCameraPosition(target, altitude, pitch, bearing) {
+            const pitch_radians = pitch * (Math.PI / 180);
+            const bearing_radians = bearing * (Math.PI / 180);
+            const distance = Math.tan(pitch_radians) * altitude;
+            const xOffset = Math.sin(bearing_radians) * distance;
+            const yOffset = Math.cos(bearing_radians) * distance;
+            //return [target[0] - xOffset / 78000, target[1] - yOffset / 110000];
+            return [target[0] - xOffset / 91000, target[1] - yOffset / 110000];
+          }
+
+          function calculateBearing(previous, current) {
+            const deltaX = current.x - previous.x;
+            const deltaY = current.y - previous.y;
+            return Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
+          }
+
+          function smoothCameraPosition(currentPosition, previousPosition, alpha) {
+            const smoothedX = (1 - alpha) * previousPosition.x + alpha * currentPosition.x;
+            const smoothedY = (1 - alpha) * previousPosition.y + alpha * currentPosition.y;
+            const smoothedZ = (1 - alpha) * previousPosition.z + alpha * currentPosition.z;
+            return new mapboxgl.MercatorCoordinate(smoothedX, smoothedY, smoothedZ);
+          }
+
+          function smoothBearing(currentBearing, previousBearing, beta) {
+            let diff = currentBearing - previousBearing;
+            if (diff > 180) diff -= 360;
+            else if (diff < -180) diff += 360;
+            return (previousBearing + beta * diff + 360) % 360;
+          }
+
+          function saveBase64(base64Data, filename) {
+            const link = document.createElement("a");
+            link.href = base64Data;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+          async function processFrame() {
+            if (currentFrame >= totalFrames) {
+                console.log("アニメーションが終了しました");
+              return;
+            }
+
+            const animationPhase = currentFrame / totalFrames;
+            console.log("currentFrame=",currentFrame,animationPhase);
+            const lineDistance = turf.length(busRoute);
+            const along = turf.along(busRoute, lineDistance * animationPhase).geometry.coordinates;
+
+            const positionSource = map.getSource("current-position");
+            if (positionSource) {
+              positionSource.setData({
+                type: "FeatureCollection",
+                features: [{
+                  type: "Feature",
+                  geometry: {
+                    type: "Point",
+                    coordinates: along
+                  }
+                }]
+              });
+            }
+
+            const lngLat = { lng: along[0], lat: along[1] };
+            const zOffset = Math.floor(map.queryTerrainElevation(lngLat, { exaggerated: false }));
+
+            const MerLngLat = mapboxgl.MercatorCoordinate.fromLngLat(lngLat, altitude + zOffset);
+
+            if (preMerLngLat) {
+              bearing = calculateBearing(preMerLngLat, MerLngLat);
+            }
+            preMerLngLat = MerLngLat;
+
+            if (preBearing) {
+              bearing = smoothBearing(bearing, preBearing, beta);
+            }
+            preBearing = bearing;
+
+            const cameraLngLat = computeCameraPosition(along, altitude, pitch, bearing);
+            const MerCameraLngLat = mapboxgl.MercatorCoordinate.fromLngLat(cameraLngLat, altitude + zOffset);
+
+            if (preMerCameraLngLat) {
+              smoothedlagLat = smoothCameraPosition(MerCameraLngLat, preMerCameraLngLat, alpha);
+            } else {
+              smoothedlagLat = MerCameraLngLat;
+            }
+            preMerCameraLngLat = smoothedlagLat;
+
+            const camera = map.getFreeCameraOptions();
+            camera.position = smoothedlagLat;
+            camera.setPitchBearing(pitch, bearing);
+            map.setFreeCameraOptions(camera);
+
+            map.once('idle', () => {
+              // CanvasからBase64を生成
+              const canvas = map.getCanvas();
+            //const base64Data = canvas.toDataURL("image/png");
+            //saveBase64(base64Data, `buskeirosmooth_${currentFrame}.png`);
+            });
+
+            currentFrame++;
+            await new Promise(resolve => setTimeout(resolve, 1)); // 5秒待機
+            processFrame();
+
+                      
+          }
+
+          processFrame();//ここで最初の呼び出し
+        });
+    });
+  </script>
+</body>
+</html>
